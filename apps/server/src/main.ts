@@ -27,7 +27,12 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix('api', {
-    exclude: ['robots.txt', 'share/:shareId/p/:pageSlug'],
+    exclude: [
+      'robots.txt',
+      'share/:shareId/p/:pageSlug',
+      'share/:shareId/s/:spaceSlug',
+      'share/:shareId/s/:spaceSlug/p/:pageSlug',
+    ],
   });
 
   const reflector = app.get(Reflector);
