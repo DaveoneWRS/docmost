@@ -84,7 +84,7 @@ export class ShareSeoController {
         workspace.id,
       );
 
-      if (!share) {
+      if (!share || !share.sharedPage) {
         return this.sendIndex(indexFilePath, res);
       }
 
