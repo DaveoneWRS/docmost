@@ -17,6 +17,26 @@ export class ShareSeoController {
   ) {}
 
   /*
+   * Serve index.html for Space Share routes (no SEO meta tags)
+   */
+  @Get([':shareId/s/:spaceSlug', ':shareId/s/:spaceSlug/p/:pageSlug'])
+  async getSpaceShare(@Res({ passthrough: false }) res: FastifyReply) {
+    const clientDistPath = join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      '..',
+      'client/dist',
+    );
+
+    if (fs.existsSync(clientDistPath)) {
+      const indexFilePath = join(clientDistPath, 'index.html');
+      return this.sendIndex(indexFilePath, res);
+    }
+  }
+
+  /*
    * add meta tags to publicly shared pages
    */
   @Get([':shareId/p/:pageSlug', 'p/:pageSlug'])
