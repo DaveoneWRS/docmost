@@ -94,23 +94,33 @@ export class SearchService {
         return [];
       }
 
-      const pageIdsToSearch = [];
-      if (share.includeSubPages) {
-        const pageList = await this.pageRepo.getPageAndDescendants(
-          share.pageId,
-          {
-            includeContent: false,
-          },
-        );
+      if (share.pageId) {
+        // Page Share: search in shared page + optional subpages
+        const pageIdsToSearch = [];
+        if (share.includeSubPages) {
+          const pageList = await this.pageRepo.getPageAndDescendants(
+            share.pageId,
+            {
+              includeContent: false,
+            },
+          );
 
-        pageIdsToSearch.push(...pageList.map((page) => page.id));
-      } else {
-        pageIdsToSearch.push(share.pageId);
-      }
+          pageIdsToSearch.push(...pageList.map((page) => page.id));
+        } else {
+          pageIdsToSearch.push(share.pageId);
+        }
 
-      if (pageIdsToSearch.length > 0) {
+        if (pageIdsToSearch.length > 0) {
+          queryResults = queryResults
+            .where('id', 'in', pageIdsToSearch)
+            .where('workspaceId', '=', opts.workspaceId);
+        } else {
+          return [];
+        }
+      } else if (share.spaceId) {
+        // Space Share: search in all pages of the entire space
         queryResults = queryResults
-          .where('id', 'in', pageIdsToSearch)
+          .where('spaceId', '=', share.spaceId)
           .where('workspaceId', '=', opts.workspaceId);
       } else {
         return [];

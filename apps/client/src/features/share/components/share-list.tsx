@@ -1,4 +1,4 @@
-import { Table, Group, Text, Anchor } from "@mantine/core";
+import { Table, Group, Text, Anchor, ActionIcon } from "@mantine/core";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -7,9 +7,10 @@ import { useGetSharesQuery } from "@/features/share/queries/share-query.ts";
 import { ISharedItem } from "@/features/share/types/share.types.ts";
 import { format } from "date-fns";
 import ShareActionMenu from "@/features/share/components/share-action-menu.tsx";
-import { buildSharedPageUrl } from "@/features/page/page.utils.ts";
+import { buildSharedPageUrl, buildSharedSpaceUrl } from "@/features/page/page.utils.ts";
 import { getPageIcon } from "@/lib";
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
+import { IconFolder } from "@tabler/icons-react";
 import classes from "./share.module.css";
 
 export default function ShareList() {
@@ -30,7 +31,26 @@ export default function ShareList() {
           </Table.Thead>
 
           <Table.Tbody>
-            {data?.items.map((share: ISharedItem, index: number) => (
+            {data?.items.map((share: ISharedItem, index: number) => {
+              const isSpaceShare = !share.page;
+              const shareUrl = isSpaceShare
+                ? buildSharedSpaceUrl({
+                    shareId: share.key,
+                    spaceSlug: share.space.slug,
+                  })
+                : buildSharedPageUrl({
+                    shareId: share.key,
+                    pageTitle: share.page.title,
+                    pageSlugId: share.page.slugId,
+                  });
+              const displayTitle = isSpaceShare
+                ? share.space.name
+                : share.page.title || t("untitled");
+              const displayIcon = isSpaceShare
+                ? <ActionIcon variant="transparent" color="gray" size={18}><IconFolder size={18} /></ActionIcon>
+                : getPageIcon(share.page.icon);
+
+              return (
               <Table.Tr key={index}>
                 <Table.Td>
                   <Anchor
@@ -42,17 +62,13 @@ export default function ShareList() {
                     }}
                     component={Link}
                     target="_blank"
-                    to={buildSharedPageUrl({
-                      shareId: share.key,
-                      pageTitle: share.page.title,
-                      pageSlugId: share.page.slugId,
-                    })}
+                    to={shareUrl}
                   >
                     <Group gap="4" wrap="nowrap">
-                      {getPageIcon(share.page.icon)}
+                      {displayIcon}
                       <div className={classes.shareLinkText}>
                         <Text fz="sm" fw={500} lineClamp={1}>
-                          {share.page.title || t("untitled")}
+                          {displayTitle}
                         </Text>
                       </div>
                     </Group>
@@ -79,7 +95,8 @@ export default function ShareList() {
                   <ShareActionMenu share={share} />
                 </Table.Td>
               </Table.Tr>
-            ))}
+              );
+            })}
           </Table.Tbody>
         </Table>
       </Table.ScrollContainer>

@@ -41,3 +41,11 @@ export const buildSharedPageUrl = (opts: {
   }
   return anchorId ? `${url}#${anchorId}` : url;
 };
+
+export const buildSharedSpaceUrl = (opts: {
+  shareId: string;
+  spaceSlug: string;
+}): string => {
+  const { shareId, spaceSlug } = opts;
+  return `/share/${shareId}/s/${spaceSlug}`;
+};

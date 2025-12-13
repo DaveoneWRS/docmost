@@ -4,6 +4,7 @@ import {
   IconCopy,
   IconDots,
   IconFileDescription,
+  IconFolder,
   IconTrash,
 } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
@@ -12,6 +13,7 @@ import { ISharedItem } from "@/features/share/types/share.types.ts";
 import {
   buildPageUrl,
   buildSharedPageUrl,
+  buildSharedSpaceUrl,
 } from "@/features/page/page.utils.ts";
 import { useClipboard } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -26,22 +28,32 @@ export default function ShareActionMenu({ share }: Props) {
   const navigate = useNavigate();
   const clipboard = useClipboard();
   const deleteShareMutation = useDeleteShareMutation();
+  const isSpaceShare = !share.page;
 
   const openPage = () => {
-    const pageLink = buildPageUrl(
-      share.space.slug,
-      share.page.slugId,
-      share.page.title,
-    );
-    navigate(pageLink);
+    if (isSpaceShare) {
+      navigate(`/s/${share.space.slug}`);
+    } else {
+      const pageLink = buildPageUrl(
+        share.space.slug,
+        share.page.slugId,
+        share.page.title,
+      );
+      navigate(pageLink);
+    }
   };
 
   const copyLink = () => {
-    const shareLink = buildSharedPageUrl({
-      shareId: share.key,
-      pageTitle: share.page.title,
-      pageSlugId: share.page.slugId,
-    });
+    const shareLink = isSpaceShare
+      ? buildSharedSpaceUrl({
+          shareId: share.key,
+          spaceSlug: share.space.slug,
+        })
+      : buildSharedPageUrl({
+          shareId: share.key,
+          pageTitle: share.page.title,
+          pageSlugId: share.page.slugId,
+        });
 
     clipboard.copy(shareLink);
     notifications.show({ message: t("Link copied") });
@@ -87,9 +99,9 @@ export default function ShareActionMenu({ share }: Props) {
 
           <Menu.Item
             onClick={openPage}
-            leftSection={<IconFileDescription size={16} />}
+            leftSection={isSpaceShare ? <IconFolder size={16} /> : <IconFileDescription size={16} />}
           >
-            {t("Open page")}
+            {isSpaceShare ? t("Open space") : t("Open page")}
           </Menu.Item>
           <Menu.Item
             c="red"
