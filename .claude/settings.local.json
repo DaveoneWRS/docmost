@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e:*)",
+      "Bash(taskkill:*)",
+      "Bash(set NX_DAEMON=false)",
+      "Bash(pnpm dev)",
+      "Bash(docker exec:*)"
+    ]
+  }
+}
