@@ -1,6 +1,6 @@
 import { StarterKit } from "@tiptap/starter-kit";
 import { TextAlign } from "@tiptap/extension-text-align";
-import { TaskList, TaskItem, ListKeymap } from "@tiptap/extension-list";
+import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { Placeholder, CharacterCount } from "@tiptap/extensions";
 import { Superscript } from "@tiptap/extension-superscript";
 import SubScript from "@tiptap/extension-subscript";
@@ -42,6 +42,7 @@ import {
   Heading,
   Highlight,
   UniqueID,
+  SharedStorage,
 } from "@docmost/editor-ext";
 import {
   randomElement,
@@ -107,6 +108,7 @@ export const mainExtensions = [
       },
     },
   }),
+  SharedStorage,
   Heading,
   UniqueID.configure({
     types: ["heading", "paragraph"],
@@ -166,6 +168,9 @@ export const mainExtensions = [
     },
   }).extend({
     addNodeView() {
+      // Force the react node view to render immediately using flush sync (https://github.com/ueberdosis/tiptap/blob/b4db352f839e1d82f9add6ee7fb45561336286d8/packages/react/src/ReactRenderer.tsx#L183-L191)
+      this.editor.isInitialized = true;
+
       return ReactNodeViewRenderer(MentionView);
     },
   }),
@@ -243,7 +248,7 @@ export const mainExtensions = [
         Escape: () => {
           const event = new CustomEvent("closeFindDialogFromEditor", {});
           document.dispatchEvent(event);
-          return true;
+          return false;
         },
       };
     },

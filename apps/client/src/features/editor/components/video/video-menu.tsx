@@ -43,7 +43,7 @@ export function VideoMenu({ editor }: EditorMenuProps) {
         return false;
       }
 
-      return editor.isActive("video");
+      return editor.isActive("video") && editor.getAttributes("video").src;
     },
     [editor],
   );
