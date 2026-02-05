@@ -112,7 +112,7 @@ export class SearchService {
             .where('id', 'in', pageIdsToSearch)
             .where('workspaceId', '=', opts.workspaceId);
         } else {
-          return [];
+          return { items: [] };
         }
       } else if (share.spaceId) {
         // Space Share: search in all pages of the entire space
